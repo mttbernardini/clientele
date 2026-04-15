@@ -24,7 +24,7 @@ client = APIClient(base_url="http://example.com")
 
 
 @client.post("/users")
-def create_user(data: CreateUserRequest, result: User) -> User:
+def create_user(result: User, data: CreateUserRequest) -> User:
     return result
 
 
