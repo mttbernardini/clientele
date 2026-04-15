@@ -337,15 +337,19 @@ class APIClient:
         recognized_kwargs = {k: v for k, v in kwargs_copy.items() if k in context.signature.parameters}
         extra_kwargs = {k: v for k, v in kwargs_copy.items() if k not in context.signature.parameters}
 
-        bound_arguments = context.signature.bind_partial(*args, result=None, **recognized_kwargs)
+        filtered_signature = context.signature.replace(
+            parameters=[
+                param
+                for name, param in context.signature.parameters.items()
+                if name not in {"self", "result", "response"}
+            ]
+        )
+        bound_arguments = filtered_signature.bind_partial(*args, **recognized_kwargs)
         bound_arguments.apply_defaults()
         call_arguments = bound_arguments.arguments
         # Note: extra_kwargs are NOT added to call_arguments - they're for query params only
 
         request_arguments = dict(call_arguments)
-        request_arguments.pop("self", None)
-        request_arguments.pop("result", None)
-        request_arguments.pop("response", None)
 
         path_params: dict[str, typing.Any] = {}
         for name in _PATH_PARAM_PATTERN.findall(context.path_template):
