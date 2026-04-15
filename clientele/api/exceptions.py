@@ -16,6 +16,9 @@ class APIException(Exception):
         self.reason = reason
         super().__init__(*args)
 
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}: {self.reason}\nResponse text: {self.response.text}"
+
 
 class HTTPStatusError(APIException):
     """HTTP response returned an error status code (4xx or 5xx)."""
