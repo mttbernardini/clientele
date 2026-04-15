@@ -24,7 +24,7 @@ _F = typing.Callable[_P, _R]
 
 
 class _WRAP_F(typing.Protocol[_P, _R]):
-    def __call__(self, result: typing.Any, *args: _P.args, **kwargs: _P.kwargs) -> _R: ...
+    def __call__(self, /, result: typing.Any, *args: _P.args, **kwargs: _P.kwargs) -> _R: ...
 
 
 class APIClient:
@@ -337,7 +337,7 @@ class APIClient:
         recognized_kwargs = {k: v for k, v in kwargs_copy.items() if k in context.signature.parameters}
         extra_kwargs = {k: v for k, v in kwargs_copy.items() if k not in context.signature.parameters}
 
-        bound_arguments = context.signature.bind_partial(*args, **recognized_kwargs)
+        bound_arguments = context.signature.bind_partial(*args, result=None, **recognized_kwargs)
         bound_arguments.apply_defaults()
         call_arguments = bound_arguments.arguments
         # Note: extra_kwargs are NOT added to call_arguments - they're for query params only
