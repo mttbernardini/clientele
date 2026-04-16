@@ -344,7 +344,7 @@ class APIClient:
                 if name not in {"self", "result", "response"}
             ]
         )
-        bound_arguments = filtered_signature.bind_partial(*args, **recognized_kwargs)
+        bound_arguments = filtered_signature.bind(*args, **recognized_kwargs)
         bound_arguments.apply_defaults()
         call_arguments = bound_arguments.arguments
         # Note: extra_kwargs are NOT added to call_arguments - they're for query params only

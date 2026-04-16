@@ -75,9 +75,16 @@ def memoize(
             if key is not None:
                 sig = inspect.signature(func)
                 try:
-                    bound = sig.bind_partial(*args, **kwargs)
+                    sig = sig.replace(
+                        parameters=[
+                            param
+                            for name, param in sig.parameters.items()
+                            if name not in IGNORE_KEYS
+                        ]
+                    )
+                    bound = sig.bind(*args, **kwargs)
                     bound.apply_defaults()
-                    key_args = {k: v for k, v in bound.arguments.items() if k not in IGNORE_KEYS}
+                    key_args = bound.arguments
                 except TypeError:
                     key_args = {k: v for k, v in kwargs.items() if k not in IGNORE_KEYS}
                 return key(**key_args)

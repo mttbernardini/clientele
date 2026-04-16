@@ -55,14 +55,19 @@ def generate_cache_key(
     # Get function signature
     sig = inspect.signature(func)
 
-    # Try to bind arguments - use partial binding to allow missing parameters
-    # This is necessary because clientele injects 'result' and 'response' parameters at runtime
+    # Try to bind arguments
     try:
-        bound = sig.bind_partial(*args, **kwargs)
+        sig = sig.replace(
+            parameters=[
+                param
+                for name, param in sig.parameters.items()
+                if name not in IGNORE_KEYS
+            ]
+        )
+        bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()
+        params = bound.arguments
 
-        # Filter out internal parameters
-        params = {k: v for k, v in bound.arguments.items() if k not in IGNORE_KEYS}
     except TypeError:
         # If binding fails, fall back to using kwargs directly
         params = {k: v for k, v in kwargs.items() if k not in IGNORE_KEYS}
